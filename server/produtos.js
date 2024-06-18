@@ -84,7 +84,10 @@ function ProdutoRouter() {
           res.status(400).send("Fora de stock");
           return;
         }
+
+
         
+
         product.quantity -= quantitySold;
         if (product.quantity <= product.minQuantity) {
           product.reorderAlert = true;
