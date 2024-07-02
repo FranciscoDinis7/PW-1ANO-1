@@ -13,9 +13,17 @@ function AuthRouter() {
   router.use(bodyParser.json({ limit: "100mb" }));
   router.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
 
+  
+  // criar User
   router.route("/register").post(function (req, res, next) {
     const body = req.body;
+    
+    if (!body.role) {
+      body.role = 'cliente';
+    }
+  
     console.log("User:", body);
+  
     Users.create(body)
       .then(() => Users.createToken(body))
       .then((response) => {
@@ -28,6 +36,7 @@ function AuthRouter() {
         next();
       });
   });
+  
 
   router.route("/me").get(function (req, res, next) {
     let token = req.headers["x-access-token"];

@@ -8,9 +8,9 @@ const ProductSchema = new Schema({
   price: Number,
   foto: String,
   rating: Number,
-  quantity: Number, // quantidade disponível
-  minQuantity: Number, // quantidade mínima
-  reorderAlert: Boolean // alerta de reposição
+  quantity: Number, 
+  minQuantity: Number, 
+  reorderAlert: Boolean 
 });
 
   module.exports = mongoose.model('Product', ProductSchema);
