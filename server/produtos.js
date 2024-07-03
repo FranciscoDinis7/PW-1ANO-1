@@ -35,8 +35,8 @@ function ProdutoRouter() {
       Product.find({})
         .then((products) => {
           res.status(200).send(products);
-          const token = req.headers ["x-access-token"];
-      console.log(token);
+          const token = req.headers["x-access-token"];
+          console.log(token);
         })
         .catch((err) => {
           console.log("Error:", err);
@@ -84,9 +84,6 @@ function ProdutoRouter() {
           res.status(400).send("Fora de stock");
           return;
         }
-
-
-        
 
         product.quantity -= quantitySold;
         if (product.quantity <= product.minQuantity) {

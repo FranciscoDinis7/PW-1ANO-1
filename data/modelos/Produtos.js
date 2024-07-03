@@ -8,7 +8,7 @@ const ProductSchema = new Schema({
   price: Number,
   foto: String,
   rating: Number,
-  quantity: Number, 
+  quantity: Number,
   minQuantity: Number, 
   reorderAlert: Boolean 
 });
