@@ -8,9 +8,7 @@ const ProductSchema = new Schema({
   price: Number,
   foto: String,
   rating: Number,
-  quantity: Number,
-  minQuantity: Number, 
-  reorderAlert: Boolean 
+  quantity: Number, 
 });
 
   module.exports = mongoose.model('Product', ProductSchema);

@@ -5,7 +5,7 @@ const { request } = require("express");
 const { findOne } = require("./user");
 const User = require("./user");
 const { UserSchema } = require("./user");
-const { ShoppingCart } = require("../modelos/carrinho");
+
 
 function UserService(UserModel) {
   let service = {

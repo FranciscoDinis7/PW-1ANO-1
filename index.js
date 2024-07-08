@@ -2,7 +2,6 @@ const http = require("http");
 const express = require("express");
 const config = require("./config");
 var mongoose = require("mongoose");
-const cartRouter = require("./server/cart");
 const cors = require("cors");
 
 const hostname = "127.0.0.1";
@@ -12,7 +11,7 @@ const app = express();
 app.use(cors())
 app.use(router.initialize());
 
-app.use("/cart", cartRouter());
+
 
 const server = http.Server(app);
 

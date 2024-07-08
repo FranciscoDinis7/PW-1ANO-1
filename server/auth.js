@@ -88,6 +88,15 @@ function AuthRouter() {
     }
   });
 
+
+  // Logout
+router.post("/logout", (req, res) => {
+  // Optionally, you can perform some server-side logic here
+  console.log("User logged out");
+  res.status(200).json({ message: "Logout successful" });
+});
+
+
   // Pesquisa
   router.route("/search").get(function (req, res, next) {
     let searchTerm = req.query.term;

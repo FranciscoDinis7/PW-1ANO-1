@@ -1,5 +1,4 @@
 const Product = require("../data/modelos/Produtos");
-const Sale = require("../data/modelos/sales");
 const express = require("express");
 const bodyParser = require("body-parser");
 const UserService = require("../data/users/service");
@@ -31,12 +30,48 @@ function ProdutoRouter() {
           next();
         });
     })
-    .get(function (req, res, next) {
-      Product.find({})
-        .then((products) => {
-          res.status(200).send(products);
-          const token = req.headers["x-access-token"];
-          console.log(token);
+    .get(async function (req, res, next) {
+      try {
+        const { page = 1, limit = 10, sort, search } = req.query;
+        const query = {};
+
+        // Handle search across title, author, and category
+        if (search) {
+          const searchRegex = new RegExp(search, "i");
+          query.$or = [
+            { title: searchRegex },
+            { author: searchRegex },
+            { category: searchRegex },
+          ];
+        }
+
+        // Fetch total count of products that match the query
+        const totalItems = await Product.countDocuments(query);
+
+        const products = await Product.find(query)
+          .sort(sort)
+          .skip((page - 1) * limit)
+          .limit(parseInt(limit))
+          .exec();
+
+        res.json({ products, totalItems });
+      } catch (err) {
+        res.status(500).json({ message: err.message });
+        next();
+      }
+    });
+
+  // Painel de administrador para buscar produto por ID
+  router
+    .route("/painel/:id")
+    .get(verificacao, autorizacao(["admin"]), function (req, res, next) {
+      const productId = req.params.id;
+      Product.findById(productId)
+        .then((product) => {
+          if (!product) {
+            return res.status(404).send({ message: "Produto não encontrado" });
+          }
+          res.status(200).send(product);
         })
         .catch((err) => {
           console.log("Error:", err);
@@ -158,4 +193,5 @@ function ProdutoRouter() {
   });
   return router;
 }
+
 module.exports = ProdutoRouter;
