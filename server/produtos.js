@@ -6,6 +6,7 @@ const UserModel = require("../data/users/user");
 const scopes = require("../data/users/scopes");
 const verificacao = require("../midleware/verfytoken");
 const autorizacao = require("../midleware/autentication");
+const encomenda = require("../data/modelos/encomenda");
 
 function ProdutoRouter() {
   let router = express();
@@ -97,18 +98,33 @@ function ProdutoRouter() {
     });
 
   // Excluir um produto
-  router.route("/:id").delete(Users.authorize([scopes["admin"]])),
-    function (req, res, next) {
-      Product.findByIdAndDelete(req.params.id)
-        .then((product) => {
-          res.status(200).send(product);
-        })
-        .catch((err) => {
-          console.log("Error:", err);
-          res.status(500).send(err);
-          next();
-        });
-    };
+  router.delete("/:id", Users.authorize(["admin"]), (req, res, next) => {
+    encomenda
+      .findOne({
+        produtoId: req.params.id,
+        status: "encomendado",
+      })
+      .then((encomenda) => {
+        if (encomenda) {
+          return res
+            .status(400)
+            .send("Não pode apagar o livro. Existem encomendas ativas.");
+        } else {
+          return Product.findByIdAndDelete(req.params.id)
+            .then((product) => {
+              res.status(200).send(product);
+            })
+            .catch((err) => {
+              console.log("Error:", err);
+              res.status(500).send(err);
+            });
+        }
+      })
+      .catch((err) => {
+        console.log("Error:", err);
+        res.status(500).send(err);
+      });
+  });
 
   // Vender um produto
   router.route("/:id/vender").post(function (req, res, next) {

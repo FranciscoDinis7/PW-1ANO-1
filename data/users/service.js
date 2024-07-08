@@ -6,7 +6,6 @@ const { findOne } = require("./user");
 const User = require("./user");
 const { UserSchema } = require("./user");
 
-
 function UserService(UserModel) {
   let service = {
     create,
@@ -23,41 +22,42 @@ function UserService(UserModel) {
   async function create(user) {
     try {
       const hashPassword = await createPassword(user);
-  
+
       let newUserWithPassword = {
         ...user,
         password: hashPassword,
       };
-  
+
       let newUser = new UserModel(newUserWithPassword);
       await save(newUser);
-  
+
       const userData = await UserModel.findOne({ _id: newUser._id });
-  
+
       if (!userData) {
         throw new Error("User not found");
       }
-  
+
       const newCart = new ShoppingCart({
         items: [],
         total: 0,
         user: userData._id,
       });
-  
+
       await save(newCart);
-  
+
       userData.carrinho = newCart._id;
       await save(userData);
-  
+
       return userData;
     } catch (error) {
       if (error.code === 11000) {
-        throw new Error("Duplicate key error: A user with this name already exists.");
+        throw new Error(
+          "Duplicate key error: A user with this name already exists."
+        );
       }
       throw error;
     }
   }
-
 
   function save(model) {
     return new Promise(function (resolve, reject) {
@@ -116,17 +116,33 @@ function UserService(UserModel) {
 
   function authorize(scopes) {
     return (request, response, next) => {
-      const { roleUser } = request;
-      console.log("route scopes:", scopes);
-      console.log("user scopes:", roleUser);
+      const token = request.headers["x-access-token"];
 
-      const hasAuthorization = scopes.some((scope) => roleUser.includes(scope));
-
-      if (roleUser && hasAuthorization) {
-        next();
-      } else {
-        response.status(403).json({ message: "Forbidden" });
+      if (!token) {
+        return response.status(401).json({ message: "No token provided" });
       }
+
+      verifyToken(token)
+        .then((decoded) => {
+          const { role } = decoded; // Assuming 'role' is included in the decoded token
+
+          console.log("route scopes:", scopes);
+          console.log("user role:", role);
+
+          const hasAuthorization = scopes.some((scope) => role.includes(scope));
+
+          if (role && hasAuthorization) {
+            request.roleuser = role; // Attach role to the request for further use if needed
+            next();
+          } else {
+            response.status(403).json({ message: "Forbidden" });
+          }
+        })
+        .catch((err) => {
+          response
+            .status(401)
+            .json({ message: "Failed to authenticate token" });
+        });
     };
   }
 
