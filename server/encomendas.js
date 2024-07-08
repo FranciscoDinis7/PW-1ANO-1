@@ -5,7 +5,7 @@ const Encomenda = require("../data/modelos/encomenda");
 const Product = require("../data/modelos/Produtos");
 
 function SalesRouter() {
-  const router = express.Router(); 
+  const router = express.Router();
   router.use(bodyParser.json({ limit: "100mb" }));
   router.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
 
@@ -40,6 +40,7 @@ function SalesRouter() {
       const savedEncomenda = await newEncomenda.save();
       res.status(201).json(savedEncomenda);
     } catch (err) {
+      console.log(err);
       res.status(500).json({ error: err.message });
     }
   });

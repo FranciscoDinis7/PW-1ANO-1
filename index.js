@@ -5,13 +5,11 @@ var mongoose = require("mongoose");
 const cors = require("cors");
 
 const hostname = "127.0.0.1";
-const port = 3001;
+const port = 3000;
 const router = require("./router");
 const app = express();
-app.use(cors())
+app.use(cors());
 app.use(router.initialize());
-
-
 
 const server = http.Server(app);
 

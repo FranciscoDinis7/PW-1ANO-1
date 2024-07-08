@@ -13,7 +13,6 @@ let UserSchema = new Schema({
   email: { type: String, required: true },
   password: { type: String, required: true },
   role: { type: String, enum: [scopes["cliente"], scopes["admin"]] },
-  carrinho: { type: Schema.Types.ObjectId, ref: "ShoppingCart" },
 });
 
 const User = mongoose.model("User", UserSchema);
